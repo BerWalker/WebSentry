@@ -38,6 +38,7 @@ def handle_choice(choice):
         pass
     elif choice == "3":
         print("Exiting...")
+        time.sleep(1)
         return False
     else:
         print("Invalid choice. Please select a valid option.")
@@ -72,8 +73,13 @@ def vulnerability_scanner_menu(scanner_type):
 
 
 if __name__ == '__main__':
-    while True:
-        print_menu()
-        user_choice = input("Enter your choice: ").strip()
-        if not handle_choice(user_choice):
-            break
+    try:
+        while True:
+            print_menu()
+            user_choice = input("Enter your choice: ").strip()
+            if not handle_choice(user_choice):
+                break
+    except KeyboardInterrupt:
+        print("\nExiting...")
+        time.sleep(1)
+        pass

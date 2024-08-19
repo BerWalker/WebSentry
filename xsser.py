@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 def perform_xss_scan(url, payload_list):
-    """Performs XSS scan on the given URL using the specified payload list."""
+    """Performs XSS scan on the given URL using the specifid payload list."""
     payloads = get_payloads_from_file(payload_list)
     if not payloads:
         logging.warning("No payloads loaded.")
@@ -32,4 +32,4 @@ def perform_xss_scan(url, payload_list):
     logging.info(f"Found inputs: {inputs}")
     test_inputs(url, inputs, payloads)
 
-    exit(1)
+    exit(0)

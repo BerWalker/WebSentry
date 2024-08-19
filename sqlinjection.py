@@ -51,7 +51,7 @@ def perform_sql_injection_scan(url, payload_list):
             except requests.exceptions.RequestException as e:
                 logging.error(f"Error testing inputs: {e}")
 
-    exit(1)
+    exit(0)
 
 
 def detect_sql_injection(response_text):
