@@ -11,6 +11,7 @@ responsibility or liability for any damage, legal consequences, or other issues 
 By using this tool, you agree to use it responsibly and within the bounds of the law."""
 
 import requests
+from bs4 import BeautifulSoup
 
 
 def check_url_alive(url):
@@ -32,3 +33,32 @@ def get_payloads_from_file(file_path):
     except IOError as e:
         print(f"Error reading payload file: {e}")
         return []
+
+
+def get_inputs(url):
+    """Extracts input fields from the given URL."""
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        inputs = soup.find_all('input')
+
+        input_details = [{'name': input_element.get('name'), 'type': input_element.get('type', 'text')}
+                         for input_element in inputs if input_element.get('name')]
+        return input_details
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching inputs: {e}")
+        return []
+
+
+def test_inputs(url, inputs, payloads):
+    """Tests input fields with payloads for potential vulnerabilities."""
+    for payload in payloads:
+        for input_info in inputs:
+            data = {input_info['name']: payload}
+            try:
+                response = requests.get(url, params=data)
+                if payload in response.text:
+                    print(f"Possible vulnerability (input field: {input_info['name']}): Payload: {payload}")
+            except requests.exceptions.RequestException as e:
+                print(f"Error testing inputs: {e}")
