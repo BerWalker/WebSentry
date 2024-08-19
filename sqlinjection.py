@@ -33,8 +33,8 @@ def perform_sql_injection_scan(url, payload_list):
 
     logging.info(f"Found inputs: {inputs}")
 
-    for input_info in inputs:
-        for payload in payloads:
+    for payload in payloads:
+        for input_info in inputs:
             data = {input_info['name']: payload}
             try:
                 response = requests.get(url, params=data, timeout=10)
