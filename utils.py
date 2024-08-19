@@ -12,15 +12,24 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 import requests
 from bs4 import BeautifulSoup
+import logging
+
+# Logging Config
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def check_url_alive(url):
     """Checks if the given URL is reachable."""
     try:
         response = requests.head(url, timeout=5)
-        return response.status_code < 400
+        if response.status_code < 400:
+            logging.info(f"URL is reachable: {url}")
+            return True
+        else:
+            logging.warning(f"URL returned status code {response.status_code}: {url}")
+            return False
     except requests.exceptions.RequestException as e:
-        print(f"Error checking URL: {e}")
+        logging.error(f"Error checking URL: {e}")
         return False
 
 
@@ -29,9 +38,10 @@ def get_payloads_from_file(file_path):
     try:
         with open(file_path, "r", encoding='utf-8') as f:
             payloads = f.read().splitlines()
+        logging.info(f"Loaded {len(payloads)} payloads from {file_path}")
         return payloads
     except IOError as e:
-        print(f"Error reading payload file: {e}")
+        logging.error(f"Error reading payload file: {e}")
         return []
 
 
@@ -45,9 +55,10 @@ def get_inputs(url):
 
         input_details = [{'name': input_element.get('name'), 'type': input_element.get('type', 'text')}
                          for input_element in inputs if input_element.get('name')]
+        logging.info(f"Found {len(input_details)} input fields on {url}")
         return input_details
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching inputs: {e}")
+        logging.error(f"Error fetching inputs: {e}")
         return []
 
 
@@ -59,6 +70,8 @@ def test_inputs(url, inputs, payloads):
             try:
                 response = requests.get(url, params=data)
                 if payload in response.text:
-                    print(f"Possible vulnerability (input field: {input_info['name']}): Payload: {payload}")
+                    logging.info(f"Possible vulnerability (input field: {input_info['name']}): Payload: {payload}")
+                else:
+                    logging.info(f"Nothing found (input field: {input_info['name']}): Payload: {payload}")
             except requests.exceptions.RequestException as e:
-                print(f"Error testing inputs: {e}")
+                logging.error(f"Error testing inputs: {e}")
