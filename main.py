@@ -54,7 +54,8 @@ def vulnerability_scanner_menu(scanner_type):
     print("#" * 50)
 
     while True:
-        target_url = input("Enter target host URL (e.g., https://example.com/page): ").strip()
+        target_url = input("Enter target host URL (e.g., https://example.com/page or"
+                           " https://example.com/test?query=): ").strip()
         if check_url_alive(target_url):
             break
 

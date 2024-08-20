@@ -42,12 +42,10 @@ def perform_sql_injection_scan(url, payload_list):
                     if detect_sql_injection(response.text):
                         logging.info(f"Possible SQL Injection vulnerability detected (input field:"
                                      f" {input_info['name']}): Payload: {payload}")
-                    elif response.status_code == 500:
+                elif response.status_code == 500:
                         logging.info(f"Server error (500) for payload: {payload}")
-                    else:
-                        logging.info(f"Nothing found (input field: {input_info['name']}): Payload: {payload}")
                 else:
-                    logging.warning(f"Non-200 response code: {response.status_code} for payload: {payload}")
+                    logging.info(f"Nothing found (input field: {input_info['name']}): Payload: {payload}")
             except requests.exceptions.RequestException as e:
                 logging.error(f"Error testing inputs: {e}")
 
