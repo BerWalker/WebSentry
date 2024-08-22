@@ -13,9 +13,15 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 import requests
 from bs4 import BeautifulSoup
 import logging
+from urllib.parse import urlparse
 
 # Logging Config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+def has_query(url):
+    parsed_url = urlparse(url)
+    return bool(parsed_url.query)
 
 
 def check_url_alive(url):
