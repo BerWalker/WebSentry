@@ -28,21 +28,21 @@ def print_menu():
 
 def handle_choice(choice):
     """Handles the user's menu choice."""
-    if choice == "1":
-        print("\nCross-Site Scripting (XSS) selected.")
-        vulnerability_scanner_menu("xss")
-    elif choice == "2":
-        print("\nSQL Injection selected.")
-        vulnerability_scanner_menu("sqlinjection")
-        pass
-    elif choice == "3":
-        print("Exiting...")
-        time.sleep(1)
-        return False
-    else:
-        print("Invalid choice. Please select a valid option.")
-        time.sleep(2)
-        print('\n' * 3)
+    match choice:
+        case "1":
+            print("\nCross-Site Scripting (XSS) selected.")
+            vulnerability_scanner_menu("xss")
+        case "2":
+            print("\nSQL Injection selected.")
+            vulnerability_scanner_menu("sqlinjection")
+        case "3":
+            print("Exiting...")
+            time.sleep(1)
+            return False
+        case _:
+            print("Invalid choice. Please select a valid option.")
+            time.sleep(2)
+            print('\n' * 3)
     return True
 
 
@@ -55,6 +55,8 @@ def vulnerability_scanner_menu(scanner_type):
     while True:
         target_url = input("Enter target host URL (e.g., https://example.com/page or"
                            " https://example.com/test?query=): ").strip()
+        if not (target_url.startswith('http://') or target_url.startswith('https://')):
+            target_url = 'https://' + target_url
         if check_url_alive(target_url):
             break
 

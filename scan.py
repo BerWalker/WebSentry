@@ -70,33 +70,34 @@ def handle_response(response, identifier, payload, attack_type):
         return
 
     # Handle different status codes
-    if response.status_code == 200:
-        if attack_type == 'SQLINJECTION':
-            if detect_sql_injection(response.text):
-                logging.info(f"Possible SQL Injection vulnerability detected "
-                             f"(identifier: {identifier}): Payload: {payload}")
+    match response.status_code:
+        case 200:
+            match attack_type:
+                case 'SQLINJECTION':
+                    if detect_sql_injection(response.text):
+                        logging.info(f"Possible SQL Injection vulnerability detected "
+                                     f"(identifier: {identifier}): Payload: {payload}")
+                    else:
+                        logging.info(f"No SQL Injection detected (identifier: {identifier}): Payload: {payload}")
 
-            else:
-                logging.info(f"No SQL Injection detected (identifier: {identifier}): Payload: {payload}")
+                case 'XSS':
+                    if payload in response.text:
+                        logging.info(f"Possible XSS vulnerability detected"
+                                     f" (identifier: {identifier}): Payload: {payload}")
+                    else:
+                        logging.info(f"No XSS detected (identifier: {identifier}): Payload: {payload}")
 
-        elif attack_type == 'XSS':
-            logging.info(f"Possible XSS vulnerability detected (identifier: {identifier}): Payload: {payload}")
-
-        else:
-            logging.info(f"Unknown attack type {attack_type}")
-
-    elif response.status_code == 400:
-        logging.error(f"Bad Request (400) for payload: {payload} (identifier: {identifier})")
-
-    elif response.status_code == 404:
-        logging.error(f"Not Found (404) for payload: {payload} (identifier: {identifier})")
-
-    elif response.status_code == 500:
-        logging.error(f"Server error (500) for payload: {payload} (identifier: {identifier})")
-
-    else:
-        logging.warning(
-            f"Non-200 response code: {response.status_code} for payload: {payload} (identifier: {identifier})")
+                case _:
+                    logging.info(f"Unknown attack type {attack_type}")
+        case 400:
+            logging.error(f"Bad Request (400) for payload: {payload} (identifier: {identifier})")
+        case 404:
+            logging.error(f"Not Found (404) for payload: {payload} (identifier: {identifier})")
+        case 500:
+            logging.error(f"Server error (500) for payload: {payload} (identifier: {identifier})")
+        case _:
+            logging.warning(
+                f"Non-200 response code: {response.status_code} for payload: {payload} (identifier: {identifier})")
 
 
 def detect_sql_injection(response_text):
