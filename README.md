@@ -11,7 +11,7 @@ Sentry is a simple web vulnerability scanner designed to identify potential secu
 
 ## Requirements
 
-- Python 3.x (we expect you to have Python 3.x installed )
+- Python 3.x
 - `requests` library (version 2.32.0 or higher)
 - `beautifulsoup4` library (version 4.12.0 or higher)
 
@@ -21,9 +21,11 @@ To install the required dependencies, run:
 pip install -r requirements.txt
 ```
 
+ (we expect you to have Python 3.x installed )
+
 ## Usage
 
-1. **Start the Scanner**: Run the `sentry.py` script to begin. In your terminal, execute:
+1. **Start the Scanner**: Run the `main.py` script to begin. In your terminal, execute:
 
 ```bash
 git clone https://github.com/berwalker/websentry.git
@@ -67,23 +69,24 @@ No wordlist provided. Using default: PayloadLists/xss.txt
 
 ## Contributing
 
-Contribuições são bem-vindas! Se você deseja contribuir:
+Contributions are welcome! If you want to contribute:
 
-1. Faça um fork do repositório.
-2. Crie uma nova branch para suas alterações.
-3. Envie um Pull Request com uma descrição clara do que foi alterado.
+1. Fork the repository.
+2. Create a new branch for your changes.
+3. Submit a Pull Request with a clear description of what was changed.
 
-Obrigado por contribuir!
+Thank you for contributing!
 
 ## License
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-Se você tiver alguma dúvida ou sugestão, sinta-se à vontade para entrar em contato:
+If you have any questions or suggestions, feel free to get in touch:
 
-- **Nome:** Bernardo W. Leichtweis
+- **Name:** Bernardo W. Leichtweis
 - **Email:** [bernardoowalkerl@gmail.com](mailto:bernardoowalkerl@gmail.com)
 - **LinkedIn:** [bernardo-w-leichtweis](https://www.linkedin.com/in/bernardo-w-leichtweis)
+
 
