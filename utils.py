@@ -27,13 +27,25 @@ def has_query(url):
 def check_url_alive(url):
     """Checks if the given URL is reachable."""
     try:
+        # Send a HEAD request to the URL
         response = requests.head(url, timeout=5)
+
+        # Check if the status code indicates the URL is reachable
         if response.status_code < 400:
             logging.info(f"URL is reachable: {url}")
             return True
-        else:
-            logging.warning(f"URL returned status code {response.status_code}: {url}")
+
+        # Handle specific cases for status codes 400
+        if response.status_code == 400:
+            logging.info(f"{response.status_code} to {url}. Want to continue? (y/N)")
+            if input().strip().upper() == 'Y':
+                return True
             return False
+
+        # Handle other status codes and log a warning
+        logging.warning(f"URL returned status code {response.status_code}: {url}")
+        return False
+
     except requests.exceptions.RequestException as e:
         logging.error(f"Error checking URL: {e}")
         return False
@@ -66,18 +78,3 @@ def get_inputs(url):
     except requests.exceptions.RequestException as e:
         logging.error(f"Error fetching inputs: {e}")
         return []
-
-
-def test_inputs(url, inputs, payloads):
-    """Tests input fields with payloads for potential vulnerabilities."""
-    for payload in payloads:
-        for input_info in inputs:
-            data = {input_info['name']: payload}
-            try:
-                response = requests.get(url, params=data)
-                if payload in response.text:
-                    logging.info(f"Possible vulnerability (input field: {input_info['name']}): Payload: {payload}")
-                else:
-                    logging.info(f"Nothing found (input field: {input_info['name']}): Payload: {payload}")
-            except requests.exceptions.RequestException as e:
-                logging.error(f"Error testing inputs: {e}")

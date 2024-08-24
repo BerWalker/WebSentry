@@ -12,8 +12,7 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 import time
 from utils import check_url_alive
-from xsser import perform_xss_scan
-from sqlinjection import perform_sql_injection_scan
+from scan import perform_scan
 
 
 def print_menu():
@@ -31,10 +30,10 @@ def handle_choice(choice):
     """Handles the user's menu choice."""
     if choice == "1":
         print("\nCross-Site Scripting (XSS) selected.")
-        vulnerability_scanner_menu("XSS")
+        vulnerability_scanner_menu("xss")
     elif choice == "2":
         print("\nSQL Injection selected.")
-        vulnerability_scanner_menu("SQL INJECTION")
+        vulnerability_scanner_menu("sqlinjection")
         pass
     elif choice == "3":
         print("Exiting...")
@@ -61,16 +60,10 @@ def vulnerability_scanner_menu(scanner_type):
 
     payload_list = input("Enter payload-list path (leave empty for default): ").strip()
     if not payload_list:
-        if scanner_type.upper() == "XSS":
-            payload_list = 'PayloadLists/xss.txt'
-        elif scanner_type.upper() == "SQL INJECTION":
-            payload_list = 'PayloadLists/sql.txt'
-        print(f"No wordlist provided. Using default: {payload_list}")
+        payload_list = f'PayloadLists/{scanner_type}.txt'
+    print(f"No wordlist provided. Using default: {payload_list}")
 
-    if scanner_type.lower() == "xss":
-        perform_xss_scan(target_url, payload_list)
-    elif scanner_type.lower() == "sql injection":
-        perform_sql_injection_scan(target_url, payload_list)
+    perform_scan(target_url, payload_list, scanner_type.upper())
 
 
 if __name__ == '__main__':
