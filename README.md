@@ -6,7 +6,6 @@ Sentry is a simple web vulnerability scanner designed to identify potential secu
 
 - **Cross-Site Scripting (XSS)**: Scans for XSS vulnerabilities by injecting payloads into web input fields and analyzing the responses.
 - **SQL Injection**: Detects potential SQL Injection vulnerabilities by injecting payloads into query parameters and examining the server responses.
-- **User-friendly Menu**: Interactive command-line interface for selecting the type of scan and input parameters.
 - **Custom Payload Lists**: Allows the use of custom payload lists for scanning.
 
 ## Requirements
@@ -25,47 +24,33 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. **Start the Scanner**: Run the `main.py` script to begin. In your terminal, execute:
+1. **Start the Scanner**: Clone the repository and navigate to the directory in your terminal:
 
 ```bash
 git clone https://github.com/berwalker/websentry.git
 cd /your/path/WebSentry
-python main.py
 ```
 
-3. **Select Scan Type**:
-   - **1**: Cross-Site Scripting (XSS)
-   - **2**: SQL Injection
-   - **3**: Exit
+2. **Run the Scan**: Execute the scanner by specifying the scan type, target URL, and optional payload list file as command-line arguments:
 
-4. **Enter Target URL**: Provide the URL of the target web application you wish to scan.
-
-5. **Provide Payload List**: Optionally, specify the path to a custom payload list. If left empty, the default payload list will be used.
-
-6. **Review Results**: The scanner will output the results of the scan, highlighting potential vulnerabilities.
-
-## Example
-
+```bash
+python main.py -a <attack_type> -u <target_url> [-w <wordlist_path>] [-h]
 ```
-##################################################
-            WEB VULNERABILITY SCANNER
-##################################################
-Select the desired attack:
-1. Cross-Site Scripting (XSS)
-2. SQL Injection
-3. Exit
-Enter your choice: 1
 
-Cross-Site Scripting (XSS) selected.
+- -a, --attack: Type of scan to perform (xss for Cross-Site Scripting or sqli for SQL Injection).
+- -u, --url: Target URL to scan, e.g., https://example.com.
+- -w, --wordlist (optional): Path to a custom payload list file. If not specified, the default payload list for the selected attack type will be used.
+- -h, --help: Displays a help message with descriptions of all options and examples for usage.
 
-##################################################
-          XSS VULNERABILITY SCANNER
-##################################################
-Enter target host URL (e.g., https://example.com/page or https://example.com/test?query=): https://example.com
-0000-00-00 00:00:00 - INFO - URL is reachable: https://google.com
-Enter payload-list path (leave empty for default):
-No wordlist provided. Using default: PayloadLists/xss.txt
+3. **Examples**:
+
+```bash
+python main.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt
 ```
+```bash
+python main.py -a xss -u https://example.com/page?query=
+```
+
 
 ## Contributing
 

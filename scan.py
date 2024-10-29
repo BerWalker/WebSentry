@@ -8,8 +8,7 @@ vulnerabilities in web applications with explicit authorization from the applica
 
 Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
 responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
-By using this tool, you agree to use it responsibly and within the bounds of the law.
-"""
+By using this tool, you agree to use it responsibly and within the bounds of the law."""
 
 import re
 import logging
@@ -73,7 +72,7 @@ def handle_response(response, identifier, payload, attack_type):
     match response.status_code:
         case 200:
             match attack_type:
-                case 'SQLINJECTION':
+                case 'SQLI':
                     if detect_sql_injection(response.text):
                         logging.info(f"Possible SQL Injection vulnerability detected "
                                      f"(identifier: {identifier}): Payload: {payload}")
