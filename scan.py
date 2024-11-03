@@ -12,6 +12,7 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 import re
 import logging
+import sys
 import requests
 from utils import get_payloads_from_file, get_inputs, has_query
 
@@ -19,46 +20,38 @@ from utils import get_payloads_from_file, get_inputs, has_query
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def perform_scan(url, payload_list, attack_type):
+def perform_scan(url, payload_list, attack_type, headers=None):
     """Performs SQL Injection or XSS scan on the given URL using the specified payload list."""
     payloads = get_payloads_from_file(payload_list)
-    if not payloads:
-        logging.warning("No payloads loaded.")
-        return
 
     if not has_query(url):
         inputs = get_inputs(url)
-        if not inputs:
-            logging.warning("No input fields found.")
-            return
-
-        logging.info(f"Found inputs: {inputs}")
-        scan_inputs(url, inputs, payloads, attack_type)
+        scan_inputs(url, inputs, payloads, attack_type, headers)
     else:
-        scan_query(url, payloads, attack_type)
+        scan_query(url, payloads, attack_type, headers)
 
 
-def scan_inputs(url, inputs, payloads, attack_type):
+def scan_inputs(url, inputs, payloads, attack_type, headers):
     """Scan for SQL Injection or XSS by sending payloads to input fields."""
     for payload in payloads:
         for input_info in inputs:
             data = {input_info['name']: payload}
             try:
-                response = requests.get(url, params=data, timeout=10)
+                response = requests.get(url, params=data, headers=headers, timeout=10)
                 handle_response(response, input_info['name'], payload, attack_type)
             except requests.exceptions.RequestException as e:
                 logging.error(f"Error testing inputs: {e}")
+                sys.exit(1)
 
-
-def scan_query(url, payloads, attack_type):
+def scan_query(url, payloads, attack_type, headers):
     """Scan the URL by appending payloads directly."""
     for payload in payloads:
         try:
-            response = requests.get(url + payload, timeout=10)
+            response = requests.get(url + payload, headers=headers, timeout=10)
             handle_response(response, url, payload, attack_type)
         except requests.exceptions.RequestException as e:
             logging.error(f"Error testing query: {e}")
-
+            sys.exit(1)
 
 def handle_response(response, identifier, payload, attack_type):
     """Handle HTTP response and detect SQL Injection or XSS."""
@@ -66,7 +59,7 @@ def handle_response(response, identifier, payload, attack_type):
     # Ensure that response has expected attributes
     if not hasattr(response, 'status_code') or not hasattr(response, 'text'):
         logging.error("Response object is missing required attributes.")
-        return
+        sys.exit(1)
 
     # Handle different status codes
     match response.status_code:
@@ -88,6 +81,7 @@ def handle_response(response, identifier, payload, attack_type):
 
                 case _:
                     logging.info(f"Unknown attack type {attack_type}")
+                    sys.exit(1)
         case 400:
             logging.error(f"Bad Request (400) for payload: {payload} (identifier: {identifier})")
         case 404:
@@ -108,10 +102,10 @@ def detect_sql_injection(response_text):
             patterns = file.read().splitlines()
     except FileNotFoundError:
         logging.error(f"Error: The file {file_path} was not found.")
-        return False
+        sys.exit(1)
     except IOError as e:
         logging.error(f"Error reading file {file_path}: {e}")
-        return False
+        sys.exit(1)
 
     compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
 

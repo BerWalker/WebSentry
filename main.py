@@ -12,7 +12,7 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 import argparse
 import time
-from utils import check_url_alive
+from utils import check_url_alive, load_headers_from_file, load_headers
 from scan import perform_scan
 
 
@@ -23,7 +23,7 @@ def parse_arguments():
                     "Ensure you have authorization to scan the target system.",
         epilog="Example usage:\n"
                "  python3 scan.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt\n"
-               "  python3 scan.py -a xss -u https://example.com/page\n",
+               "  python3 scan.py -a xss -u https://example.com/page\n --header-file file.txt",
         formatter_class=argparse.RawTextHelpFormatter
     )
 
@@ -53,26 +53,48 @@ def parse_arguments():
              "  PayloadLists/sqli.txt  - for SQL Injection scans"
     )
 
+    parser.add_argument(
+        '--header',
+        action='append',
+        help="Define custom headers in the format 'Header-Name: value'. Use multiple '--header' flags for multiple headers."
+    )
+
+    parser.add_argument(
+        '--header-file',
+        type=str,
+        help="Path to a file with custom headers. Each line should be in 'Header-Name: value' format."
+    )
+
     return parser.parse_args()
+
+
 if __name__ == '__main__':
     try:
         args = parse_arguments()
         attack_type = args.attack
         target_url = args.url.strip()
+        custom_headers = {}
 
         # Add protocol if missing
         if not (target_url.startswith('http://') or target_url.startswith('https://')):
             target_url = 'https://' + target_url
 
-        if not check_url_alive(target_url):
-            print(f"The target URL {target_url} is not accessible.")
+        # Checking if URL is acessible
+        check_url_alive(target_url)
 
+        # Load payload list
         payload_list = args.wordlist if args.wordlist else f'PayloadLists/{attack_type}.txt'
-        print(f"Using payload list: {payload_list}")
 
-        perform_scan(target_url, payload_list, attack_type.upper())
+        # Check for custom header-file
+        if args.header_file:
+            custom_headers = load_headers_from_file(args.header_file)
+
+        # Check for custom single header parameter
+        if args.header:
+            custom_headers = load_headers(args.header)
+
+        perform_scan(target_url, payload_list, attack_type.upper(), custom_headers)
 
     except KeyboardInterrupt:
         print("\nExiting...")
         time.sleep(1)
-        pass
