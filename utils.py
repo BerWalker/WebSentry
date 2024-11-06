@@ -15,6 +15,8 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 from urllib.parse import urlparse
+import json
+import xml.etree.ElementTree as ET
 
 # Logging Config
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -108,8 +110,43 @@ def get_inputs(url):
 
         input_details = [{'name': input_element.get('name'), 'type': input_element.get('type', 'text')}
                          for input_element in inputs if input_element.get('name')]
-        logging.info(f"Found {len(input_details)} input fields on {url}")
+        if len(input_details) > 0:
+            logging.info(f"Found {len(input_details)} input fields on {url}")
+        else:
+            logging.warning(f"No input fields on {url}")
+            sys.exit(1)
         return input_details
     except requests.exceptions.RequestException as e:
         logging.error(f"Error fetching inputs: {e}")
         sys.exit(1)
+
+def export_plain(results, filename):
+    """Exports results in plain text format."""
+    with open(filename, "w") as file:
+        for result in results:
+            file.write(f"Identifier: {result['identifier']}, Payload: {result['payload']}, "
+                       f"Attack Type: {result['attack_type']}, URL: {result['url']}, "
+                       f"HTTP Status Code: {result['http_status_code']}, "
+                       f"Timestamp: {result['timestamp']}\n")
+    logging.info(f"Results exported in plain text format as {filename}.")
+
+def export_json(results, filename):
+    """Exports results in JSON format."""
+    with open(filename, "w") as file:
+        json.dump(results, file, indent=4)
+    logging.info(f"Results exported in JSON format as {filename}.")
+
+def export_xml(results, filename):
+    """Exports results in XML format."""
+    root = ET.Element("ScanResults")
+    for result in results:
+        item = ET.SubElement(root, "Result")
+        ET.SubElement(item, "Identifier").text = result["identifier"]
+        ET.SubElement(item, "Payload").text = result["payload"]
+        ET.SubElement(item, "AttackType").text = result["attack_type"]
+        ET.SubElement(item, "URL").text = result["url"]
+        ET.SubElement(item, "HTTPStatusCode").text = str(result["http_status_code"])
+        ET.SubElement(item, "Timestamp").text = result["timestamp"]
+    tree = ET.ElementTree(root)
+    tree.write(filename)
+    logging.info(f"Results exported in XML format as {filename}.")

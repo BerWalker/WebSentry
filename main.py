@@ -12,58 +12,26 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 import argparse
 import time
-from utils import check_url_alive, load_headers_from_file, load_headers
+from utils import check_url_alive, load_headers_from_file, load_headers, export_plain, export_json, export_xml
 from scan import perform_scan
 
 
 def parse_arguments():
     """Parses command-line arguments for the vulnerability scanner."""
     parser = argparse.ArgumentParser(
-        description="Web Vulnerability Scanner - A tool to audit and identify vulnerabilities in web applications. "
-                    "Ensure you have authorization to scan the target system.",
-        epilog="Example usage:\n"
-               "  python3 scan.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt\n"
-               "  python3 scan.py -a xss -u https://example.com/page\n --header-file file.txt",
+        description="Web Vulnerability Scanner - A tool to audit and identify vulnerabilities in web applications. Ensure you have authorization to scan the target system.",
+        epilog="Example usage:\n  python3 scan.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt\n  python3 scan.py -a xss -u https://example.com/page --header-file file.txt",
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument(
-        '-a', '--attack',
-        choices=['xss', 'sqli'],
-        required=True,
-        help="Type of attack to perform:\n"
-             "  xss   - Cross-Site Scripting scan\n"
-             "  sqli  - SQL Injection scan"
-    )
-
-    parser.add_argument(
-        '-u', '--url',
-        required=True,
-        help="Target URL to scan. Example format:\n"
-             "  https://example.com/page\n"
-             "  https://example.com/test?query="
-    )
-
-    parser.add_argument(
-        '-w', '--wordlist',
-        default=None,
-        help="Optional path to the payload list file. If not provided, a default wordlist will be used based on "
-             "the attack type:\n"
-             "  PayloadLists/xss.txt   - for XSS scans\n"
-             "  PayloadLists/sqli.txt  - for SQL Injection scans"
-    )
-
-    parser.add_argument(
-        '--header',
-        action='append',
-        help="Define custom headers in the format 'Header-Name: value'. Use multiple '--header' flags for multiple headers."
-    )
-
-    parser.add_argument(
-        '--header-file',
-        type=str,
-        help="Path to a file with custom headers. Each line should be in 'Header-Name: value' format."
-    )
+    parser.add_argument('-a', '--attack', choices=['xss', 'sqli'], required=True, help="Type of attack to perform: xss - Cross-Site Scripting scan, sqli - SQL Injection scan.")
+    parser.add_argument('-u', '--url', required=True, help="Target URL to scan. Example format: https://example.com/page, https://example.com/test?query=")
+    parser.add_argument('-w', '--wordlist', default=None, help="Optional path to the payload list file. Default wordlist used based on attack type.")
+    parser.add_argument('--header', action='append', help="Define custom headers in the format 'Header-Name: value'. Use multiple '--header' flags for multiple headers.")
+    parser.add_argument('--header-file', type=str, help="Path to a file with custom headers. Each line should be in 'Header-Name: value' format.")
+    parser.add_argument('-o', '--output', type=str, help="Export results in plain text format with specified filename.")
+    parser.add_argument('-oX', '--xml', type=str, help="Export results in XML format with specified filename.")
+    parser.add_argument('-oJ', '--json', type=str, help="Export results in JSON format with specified filename.")
 
     return parser.parse_args()
 
@@ -93,7 +61,16 @@ if __name__ == '__main__':
         if args.header:
             custom_headers = load_headers(args.header)
 
-        perform_scan(target_url, payload_list, attack_type.upper(), custom_headers)
+        # Perform the scan and store results
+        results = perform_scan(target_url, payload_list, attack_type.upper(), custom_headers)
+
+        # Export based on argument and filename
+        if args.output:
+            export_plain(results, args.output)
+        elif args.xml:
+            export_xml(results, args.xml)
+        elif args.json:
+            export_json(results, args.json)
 
     except KeyboardInterrupt:
         print("\nExiting...")
