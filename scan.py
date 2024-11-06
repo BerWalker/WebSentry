@@ -10,6 +10,7 @@ Unauthorized use or use for malicious purposes is strictly prohibited and may be
 responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
 By using this tool, you agree to use it responsibly and within the bounds of the law."""
 
+import json
 import re
 import logging
 import sys
@@ -80,9 +81,12 @@ def handle_response(response, identifier, payload, attack_type):
         case 200:
             match attack_type:
                 case 'SQLI':
-                    if detect_sql_injection(response.text):
+                    db_type = detect_sql_injection_and_db_type(response.text)
+                    if db_type:
                         logging.info(f"Possible SQL Injection vulnerability detected "
                                      f"(identifier: {identifier}): Payload: {payload}")
+                        logging.info(f"Possible Database detected {db_type}")
+
                         return {
                             "identifier": identifier,
                             "payload": payload,
@@ -124,24 +128,17 @@ def handle_response(response, identifier, payload, attack_type):
     return None
 
 
-def detect_sql_injection(response_text):
-    """Detects signs of SQL Injection in the response text."""
-    file_path = 'PayloadLists/sql_errors.txt'
+def detect_sql_injection_and_db_type(response_text):
+    """Detects SQL Injection and attempts to identify the database type based on error messages."""
 
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            patterns = file.read().splitlines()
-    except FileNotFoundError:
-        logging.error(f"Error: The file {file_path} was not found.")
-        sys.exit(1)
-    except IOError as e:
-        logging.error(f"Error reading file {file_path}: {e}")
-        sys.exit(1)
+    # Loads pattern dictionary
+    with open("db_patterns.json", 'r', encoding='utf-8') as f:
+        db_patterns = json.load(f)
 
-    compiled_patterns = [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
+    # Checks for errors and database types
+    for db_type, pattern in db_patterns.items():
+        if re.search(pattern, response_text, re.IGNORECASE):
+            return db_type
 
-    for pattern in compiled_patterns:
-        if pattern.search(response_text):
-            return True
-
+    logging.info("No SQL Injection vulnerability detected.")
     return False

@@ -11,7 +11,7 @@ responsibility or liability for any damage, legal consequences, or other issues 
 By using this tool, you agree to use it responsibly and within the bounds of the law."""
 
 import argparse
-import time
+import sys
 from utils import check_url_alive, load_headers_from_file, load_headers, export_plain, export_json, export_xml
 from scan import perform_scan
 
@@ -74,4 +74,4 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("\nExiting...")
-        time.sleep(1)
+        sys.exit(0)
