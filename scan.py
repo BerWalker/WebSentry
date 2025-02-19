@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 def perform_scan(url, payload_list, attack_type, headers=None):
-    """Performs SQL Injection or XSS scan on the given URL using the specified payload list."""
+    """Performs scanning for SQL Injection, XSS, LFI, or Path Traversal."""
     payloads = get_payloads_from_file(payload_list)
     results = []
 
@@ -69,7 +69,7 @@ def scan_query(url, payloads, attack_type, headers):
 
 
 def handle_response(response, identifier, payload, attack_type):
-    """Handle HTTP response and detect SQL Injection or XSS."""
+    """Handle HTTP response and detect vulnerabilities."""
 
     # Ensure that response has expected attributes
     if not hasattr(response, 'status_code') or not hasattr(response, 'text'):
@@ -113,6 +113,24 @@ def handle_response(response, identifier, payload, attack_type):
 
                     else:
                         logging.info(f"No XSS detected (identifier: {identifier}): Payload: {payload}")
+
+                case 'LFI':
+                    lfi = detect_lfi(response.text)
+                    if lfi:
+                        logging.info(f"Possible LFI vulnerability detected"
+                                     f" (identifier: {identifier}): Payload: {payload}")
+                        return {
+                            "identifier": identifier,
+                            "payload": payload,
+                            "attack_type": attack_type,
+                            "url": response.url,
+                            "http_status_code": response.status_code,
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+
+                    else:
+                        logging.info(f"No LFI detected (identifier: {identifier}): Payload: {payload}")
+
                 case _:
                     logging.info(f"Unknown attack type {attack_type}")
                     sys.exit(1)
@@ -132,7 +150,7 @@ def detect_sql_injection_and_db_type(response_text):
     """Detects SQL Injection and attempts to identify the database type based on error messages."""
 
     # Loads pattern dictionary
-    with open("db_patterns.json", 'r', encoding='utf-8') as f:
+    with open("Patterns/db_patterns.json", 'r', encoding='utf-8') as f:
         db_patterns = json.load(f)
 
     # Checks for errors and database types
@@ -140,5 +158,16 @@ def detect_sql_injection_and_db_type(response_text):
         if re.search(pattern, response_text, re.IGNORECASE):
             return db_type
 
-    logging.info("No SQL Injection vulnerability detected.")
+    return False
+
+def detect_lfi(response_text):
+    """Detects Local File Inclusion (LFI) by searching for specific patterns in response text."""
+
+    # Open the file containing common LFI patterns
+    with open("Patterns/lfi_patterns.txt", 'r', encoding='utf-8') as f:
+        for pattern in f:
+            # If pattern found in the response text, return True
+            if pattern.strip() in response_text:
+                return True
+
     return False

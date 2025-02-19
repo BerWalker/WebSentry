@@ -20,11 +20,11 @@ def parse_arguments():
     """Parses command-line arguments for the vulnerability scanner."""
     parser = argparse.ArgumentParser(
         description="Web Vulnerability Scanner - A tool to audit and identify vulnerabilities in web applications. Ensure you have authorization to scan the target system.",
-        epilog="Example usage:\n  python3 scan.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt\n  python3 scan.py -a xss -u https://example.com/page --header-file file.txt",
+        epilog="Example usage:\n  python3 sentry.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt\n  python3 sentry.py -a xss -u https://example.com/page --header-file file.txt",
         formatter_class=argparse.RawTextHelpFormatter
     )
 
-    parser.add_argument('-a', '--attack', choices=['xss', 'sqli'], required=True, help="Type of attack to perform: xss - Cross-Site Scripting scan, sqli - SQL Injection scan.")
+    parser.add_argument('-a', '--attack', choices=['xss', 'sqli', 'lfi'], required=True, help="Type of attack to perform: xss - Cross-Site Scripting scan, sqli - SQL Injection scan.")
     parser.add_argument('-u', '--url', required=True, help="Target URL to scan. Example format: https://example.com/page, https://example.com/test?query=")
     parser.add_argument('-w', '--wordlist', default=None, help="Optional path to the payload list file. Default wordlist used based on attack type.")
     parser.add_argument('--header', action='append', help="Define custom headers in the format 'Header-Name: value'. Use multiple '--header' flags for multiple headers.")
