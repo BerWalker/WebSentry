@@ -1,22 +1,23 @@
 # Sentry Web Vulnerability Scanner
 
-Sentry is a simple web vulnerability scanner designed to identify potential security weaknesses in web applications. It currently supports detecting vulnerabilities such as Reflected XSS and Error-Based SQL Injection.
+Sentry is a tool designed to audit and identify common vulnerabilities in web applications. It can be used to scan a target website by injecting various payloads into query strings and analyzing the responses.
+
+Important: Ensure that you have authorization to scan the target web application. Unauthorized usage is illegal and unethical.
 
 ## Features
 
-- **Reflected Cross-Site Scripting (XSS)**: Scans for reflected XSS vulnerabilities.
-- **Error-Based SQL Injection**: Detects error-based SQL injection vulnerabilities for MySQL, PostgreSQL, MSSQL, Oracle, SQLite, and Generic error messages.
-- **Input Field Discovery**: Automatically detects input fields (such as query parameters, form inputs, etc.) on the target page to test for vulnerabilities.
-- **Direct Query Support**: Allows the user to specify a direct query (e.g., URL with parameters or form data) for targeted scanning, bypassing the need for the scanner to find inputs on its own.
-- **Custom Payload Lists**: Allows the use of custom payload lists for scanning.
+- **XSS (Cross-Site Scripting) Detection**: Scans for Cross-Site Scripting (XSS) vulnerabilities by injecting XSS payloads into the target URL's query string and detecting script execution on the page.
+- **SQL Injection (SQLi) Detection**: Identifies SQL Injection vulnerabilities by injecting SQL-specific payloads into the URL query string and checking for database error patterns or unexpected behavior.
+- **Wordlist-based Attacks**: Uses a list of payloads (either provided by the user or default) for testing vulnerabilities.
 - **Custom Headers**: Supports adding custom HTTP headers for each scan, either individually or through a file, allowing greater control over the request configurations.
-- **Export Results in Multiple Formats**: Export scan results in plain text, JSON, or XML formats for greater flexibility.
+- **Selenium Integration**: Uses Selenium WebDriver to interact with dynamic content, making it possible to detect vulnerabilities like XSS that rely on JavaScript execution.
 
 ## Requirements
 
 - Python 3.x
 - `requests` library (version 2.32.0 or higher)
-- `beautifulsoup4` library (version 4.12.0 or higher)
+- `selenium` library (version 4.28.0 or higher)
+- `selenium-wire` library (version 5.1.0 or higher)
 
 To install the required dependencies, run:
 
@@ -26,41 +27,34 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. **Start the Scanner**: Clone the repository and navigate to the directory in your terminal:
+1. **Start the Scanner**:
 
 ```bash
 git clone https://github.com/berwalker/websentry.git
 cd /your/path/WebSentry
 ```
 
-2. **Run the Scan**: Execute the scanner by specifying the attack type, target URL, and optionally the wordlist file path, as well as custom headers if needed. You can also specify output parameters to generate reports in plain text, XML, or JSON formats:
+2. **Run the Scan**:
 
 ```bash
-python sentry.py -a <attack_type> -u <target_url> [-w <wordlist_path>] [--header <Header-Name: value>] [--header-file <path_to_header_file>] [-o <output_filename>] [-oX <output_filename>] [-oJ <output_filename>]
+python ./sentry.py [-h] [-a {xss,sqli}] [-u URL] [-w WORDLIST] [--header HEADER] [--header-file HEADER_FILE]
 ```
 
-- -a, --attack: Type of scan to perform (xss for Cross-Site Scripting or sqli for SQL Injection).
-- -u, --url: Target URL to scan, e.g., https://example.com.
-- -w, --wordlist (optional): Path to a custom payload list file. If not specified, the default payload list for the selected attack type will be used.
-- --header (optional): Custom headers in (Header-Name: value) format. This option can be specified multiple times to add multiple headers.
-- --header-file (optional): Path to a file with custom headers. Each line should follow the format (Header-Name: value).
-- -o, --output (optional): Export results in plain text format with specified filename.
-- -oX, --xml (optional): Export results in XML format with specified filename.
-- -oJ, --json (optional): Export results in JSON format with specified filename.
+- -a, --attack: Type of scan to perform.
+- -u, --url: Target URL to scan, e.g., https://example.com/query=.
+- -w, --wordlist: Path to a custom payload list file. If not specified, the default payload list for the selected attack type will be used.
+- --header: Custom headers in (Header-Name: value) format. This option can be specified multiple times to add multiple headers.
+- --header-file: Path to a file with custom headers. Each line should follow the format (Header-Name: value).
 - -h, --help: Displays a help message with descriptions of all options and examples for usage.
 
 3. **Examples**:
 
 ```bash
-python sentry.py -a sqli -u https://example.com -w wordlists/sqli_payloads.txt -o scanner_result.txt
+python ./sentry.py -a sqli -u https://example.com/page?query= --header "User-Agent: CustomAgent/1.0" --header "Authorization: token123"
 ```
 ```bash
-python sentry.py -a xss -u https://example.com/page?query= --header "User-Agent: CustomAgent/1.0" --header "Authorization: token123"
+python ./sentry.py -a xss -u https://example.com/page?query= --header-file headers.txt -w /Path/to/Wordlist.txt
 ```
-```bash
-python sentry.py -a xss -u https://example.com/page?query= --header-file headers.txt -oX scanner_result.xml
-```
-
 
 ## Contributing
 
