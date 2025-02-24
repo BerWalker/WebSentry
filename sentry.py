@@ -1,21 +1,11 @@
-"""
-Copyright (c) 2024 Bernardo Walker Leichtweis
-
-Licensed under the MIT License. See the LICENSE file for details.
-
-WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
-vulnerabilities in web applications with explicit authorization from the application owner.
-
-Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
-responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
-By using this tool, you agree to use it responsibly and within the bounds of the law.
-"""
-
 import argparse
 import sys
 from scan import perform_scan
 from utils import check_url_alive, load_headers, load_headers_from_file
+from colorama import init, Fore
 
+# Initialize colorama
+init(autoreset=True)
 
 def parse_arguments():
     """
@@ -52,7 +42,7 @@ if __name__ == '__main__':
     The main entry point for the vulnerability scanner. Parses command-line arguments,
     displays a welcome message, and initiates the vulnerability scan based on the user's input.
     """
-    print("""
+    print(Fore.LIGHTWHITE_EX + """
         ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
         ▐██╗    ██╗███████╗██████╗ ███████╗███████╗███╗   ██╗████████╗██████╗ ██╗   ██╗▌
         ▐██║    ██║██╔════╝██╔══██╗██╔════╝██╔════╝████╗  ██║╚══██╔══╝██╔══██╗╚██╗ ██╔╝▌
@@ -69,7 +59,7 @@ if __name__ == '__main__':
 
         # Ensure necessary parameters are provided
         if not args.attack or not args.url:
-            print("[!] Required parameters missing. Please provide the following details:")
+            print(Fore.YELLOW + "[!] Required parameters missing. Please provide the following details:")
 
         # Attack type selection if not specified in arguments
         if not args.attack:
@@ -77,19 +67,19 @@ if __name__ == '__main__':
             print("2. SQL Injection")
             #print("3. LFI - Local File Inclusion")
 
-            attack_choice = input("[*] Enter the number corresponding to the attack type (1/2): ")
+            attack_choice = input(Fore.CYAN + "[*] Enter the number corresponding to the attack type (1/2): ")
 
             while attack_choice not in ['1', '2', '3']:
-                print("Invalid choice. Please try again.")
-                attack_choice = input("[*] Enter the number corresponding to the attack type (1/2): ")
+                print(Fore.RED + "Invalid choice. Please try again.")
+                attack_choice = input(Fore.CYAN + "[*] Enter the number corresponding to the attack type (1/2): ")
 
             # Map input choice to attack type
             if attack_choice == '1':
                 attack_type = 'xss'
-                print("XSS - Cross-Site Scripting SELECTED")
+                print(Fore.GREEN + "XSS - Cross-Site Scripting SELECTED")
             elif attack_choice == '2':
                 attack_type = 'sqli'
-                print("SQL Injection SELECTED")
+                print(Fore.GREEN + "SQL Injection SELECTED")
             #elif attack_choice == '3':
             #    attack_type = 'lfi'
             #    print("LFI - Local File Inclusion SELECTED")
@@ -98,7 +88,7 @@ if __name__ == '__main__':
 
         # Get the target URL
         if not args.url:
-            target_url = input("[*] Enter the target URL (e.g., https://example.com/query?param=): ")
+            target_url = input(Fore.CYAN + "[*] Enter the target URL (e.g., https://example.com/query?param=): ")
         else:
             target_url = args.url.strip()
 

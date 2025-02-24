@@ -1,19 +1,11 @@
-"""
-Copyright (c) 2024 Bernardo Walker Leichtweis
-
-Licensed under the MIT License. See the LICENSE file for details.
-
-WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
-vulnerabilities in web applications with explicit authorization from the application owner.
-
-Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
-responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
-By using this tool, you agree to use it responsibly and within the bounds of the law.
-"""
-
 import re
 import time
 from utils import create_driver, get_payloads_from_file, has_query, load_db_patterns
+from colorama import init, Fore
+
+# Initialize colorama
+init(autoreset=True)
+
 
 def test_by_query(driver, target_url, payload_list, attack_type):
     """
@@ -56,10 +48,10 @@ def handle_response(driver, target_url, payload, attack_type):
         # Check for XSS vulnerability by detecting alert popups
         try:
             alert = driver.switch_to.alert
-            print(f"[+] Possible XSS found: {message}")
+            print(Fore.GREEN + f"[+] Possible XSS found: {message}")
             alert.accept()
         except Exception:
-            print(f"[-] No XSS found: {message}")
+            print(Fore.RED + f"[-] No XSS found: {message}")
 
     elif attack_type == "SQLI":
         # Detect SQL Injection vulnerabilities by looking for error patterns
@@ -70,9 +62,9 @@ def handle_response(driver, target_url, payload, attack_type):
                          if re.search(pattern, page_source, re.IGNORECASE)), None)
 
         if db_found:
-            print(f"[+] Possible SQL Injection found: {message} | Database: {db_found}")
+            print(Fore.GREEN + f"[+] Possible SQL Injection found: {message} | Database: {db_found}")
         else:
-            print(f"[-] No SQL Injection found: {message}")
+            print(Fore.RED + f"[-] No SQL Injection found: {message}")
 
 def perform_scan(attack_type, target_url, payload_list, headers=None):
     """
@@ -95,7 +87,9 @@ def perform_scan(attack_type, target_url, payload_list, headers=None):
     driver = create_driver(headers)
 
     # Perform testing by injecting payloads into the URL query string
+    print(Fore.CYAN + "[*] Starting scan...")
     test_by_query(driver, target_url, payload_list, attack_type)
 
     # Close the WebDriver after the scan
     driver.quit()
+    print(Fore.CYAN + "[*] Scan completed.")

@@ -1,22 +1,13 @@
-"""
-Copyright (c) 2024 Bernardo Walker Leichtweis
-
-Licensed under the MIT License. See the LICENSE file for details.
-
-WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
-vulnerabilities in web applications with explicit authorization from the application owner.
-
-Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
-responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
-By using this tool, you agree to use it responsibly and within the bounds of the law.
-"""
-
 import sys
 import json
 import requests
 from seleniumwire import webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
+from colorama import init, Fore
+
+# Initialize colorama
+init(autoreset=True)
 
 
 def has_query(url):
@@ -34,18 +25,20 @@ def has_query(url):
 
     if not query:
         user_response = input(
-            f"No query parameter found in the URL: {url}.\n"
+            f"{Fore.YELLOW}No query parameter found in the URL: {Fore.CYAN}{url}.\n"
             f"Would you like to continue without a query parameter? (y/N): ")
 
         while user_response.lower() not in ['y', 'n']:
-            user_response = input("Invalid input. Please enter 'y' to continue or 'n' to abort: ")
+            user_response = input(f"{Fore.RED}Invalid input. Please enter 'y' to continue or 'n' to abort: ")
 
         if user_response.lower() == 'y':
-            print("Continuing without a query parameter...")
+            print(f"{Fore.BLUE}Continuing without a query parameter...")
             return True
         elif user_response.lower() == 'n':
-            print("Process aborted.")
+            print(f"{Fore.RED}Process aborted.")
             exit(0)
+    else:
+        print(Fore.BLUE + "[*] Target URL contains a query string, testing with payloads...")
 
     return True
 
@@ -69,20 +62,20 @@ def check_url_alive(url):
 
         # Check if the status code indicates the URL is reachable
         if response.status_code < 400:
-            print(f"URL returned status code {response.status_code}: {url}")
-            print(f"URL is reachable: {url}")
+            print(f"{Fore.BLUE}URL returned status code {response.status_code}: {url}")
+            print(f"{Fore.BLUE}URL is reachable: {url}")
             return True
 
         # Handle specific cases for status codes 400 and above
         if response.status_code >= 400:
             if response.status_code == 404:
-                print(f"URL returned status code {response.status_code}: {url}")
+                print(f"{Fore.RED}URL returned status code {response.status_code}: {url}")
                 sys.exit(1)
-            print(f"URL returned status code {response.status_code}: {url}. Do you want to continue? (y/N)")
+            print(f"{Fore.YELLOW}URL returned status code {response.status_code}: {url}. Do you want to continue? (y/N)")
 
             choice = input().strip().upper()
             while choice not in ['Y', 'N']:
-                choice = input("Do you want to continue? (y/N): ").strip().upper()
+                choice = input(f"{Fore.CYAN}Do you want to continue? (y/N): ").strip().upper()
 
             if choice == 'Y':
                 return True
@@ -90,7 +83,7 @@ def check_url_alive(url):
             sys.exit(1)
 
     except requests.exceptions.RequestException as e:
-        print(f"Error checking URL: {e}")
+        print(f"{Fore.RED}Error checking URL: {e}")
         sys.exit(1)
 
 
@@ -138,10 +131,10 @@ def get_payloads_from_file(file_path):
     try:
         with open(file_path, "r", encoding='utf-8') as f:
             payloads = f.read().splitlines()
-        print(f"Loaded {len(payloads)} payloads from {file_path}")
+        print(f"{Fore.BLUE}Loaded {len(payloads)} payloads from {file_path}")
         return payloads
     except IOError as e:
-        print(f"Error reading payload file: {e}")
+        print(f"{Fore.RED}Error reading payload file: {e}")
         sys.exit(1)
 
 
@@ -179,14 +172,14 @@ def load_headers_from_file(file_path):
                 if ':' in line:
                     key, value = line.split(":", 1)
                     headers[key.strip()] = value.strip()
-        print(f"Loaded headers from {file_path}")
+        print(f"{Fore.BLUE}Loaded headers from {file_path}")
         for key, value in headers.items():
-            print(f"Header loaded ({key}: {value})")
+            print(f"{Fore.BLUE}Header loaded ({key}: {value})")
     except FileNotFoundError:
-        print(f"Error: Header File '{file_path}' not found.")
+        print(f"{Fore.RED}Error: Header File '{file_path}' not found.")
         sys.exit(1)
     except IOError as e:
-        print(f"Error reading header file '{file_path}': {e}")
+        print(f"{Fore.RED}Error reading header file '{file_path}': {e}")
         sys.exit(1)
     return headers
 
@@ -210,9 +203,9 @@ def load_headers(headers):
         try:
             key, value = header.split(":", 1)
             custom_headers[key.strip()] = value.strip()
-            print(f"Header loaded ({key.strip()}: {value.strip()})")
+            print(f"{Fore.BLUE}Header loaded ({key.strip()}: {value.strip()})")
         except ValueError:
-            print(f"Error: '{header}'. Should be in the format 'Header-Name: value'.")
+            print(f"{Fore.RED}Error: '{header}'. Should be in the format 'Header-Name: value'.")
             sys.exit(1)
 
     return custom_headers
