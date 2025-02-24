@@ -18,6 +18,7 @@ Important: Ensure that you have authorization to scan the target web application
 - `requests` library (version 2.32.0 or higher)
 - `selenium` library (version 4.28.0 or higher)
 - `selenium-wire` library (version 5.1.0 or higher)
+- `setuptools` library (version 75.8.0 or higher)
 
 To install the required dependencies, run:
 

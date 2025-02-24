@@ -35,7 +35,7 @@ def parse_arguments():
 
     # Define command-line arguments for the scanner
     parser.add_argument('-a', '--attack', choices=['xss', 'sqli'], required=False,
-                        help="Type of attack to perform: xss - Cross-Site Scripting scan.")
+                        help="Type of attack to perform: xss - Cross-Site Scripting, sqli - SQL Injection.")
     parser.add_argument('-u', '--url', required=False,
                         help="Target URL to scan. Example format: https://example.com/test?query=")
     parser.add_argument('-w', '--wordlist', default=None,
