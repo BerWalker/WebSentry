@@ -17,6 +17,7 @@ Important: Ensure that you have authorization to scan the target web application
 - Python 3.x
 - `requests` library (version 2.32.0 or higher)
 - `selenium` library (version 4.28.0 or higher)
+- `blinker` library (version 1.7.0)
 - `selenium-wire` library (version 5.1.0 or higher)
 - `setuptools` library (version 75.8.0 or higher)
 
