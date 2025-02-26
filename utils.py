@@ -1,3 +1,4 @@
+import re
 import sys
 import json
 import requests
@@ -5,6 +6,7 @@ from seleniumwire import webdriver
 from selenium.webdriver.firefox.options import Options
 from urllib.parse import urlparse
 from colorama import init, Fore
+import xml.etree.ElementTree as ET
 
 # Initialize colorama
 init(autoreset=True)
@@ -20,27 +22,31 @@ def has_query(url):
     Returns:
         bool: True if the URL contains a query string, False otherwise.
     """
-    parsed_url = urlparse(url)
-    query = bool(parsed_url.query)
+    try:
+        parsed_url = urlparse(url)
+        query = bool(parsed_url.query)
 
-    if not query:
-        user_response = input(
-            f"{Fore.YELLOW}No query parameter found in the URL: {Fore.CYAN}{url}.\n"
-            f"Would you like to continue without a query parameter? (y/N): ")
+        if not query:
+            user_response = input(
+                f"{Fore.YELLOW}No query parameter found in the URL: {Fore.CYAN}{url}.\n"
+                f"Would you like to continue without a query parameter? (y/N): ")
 
-        while user_response.lower() not in ['y', 'n']:
-            user_response = input(f"{Fore.RED}Invalid input. Please enter 'y' to continue or 'n' to abort: ")
+            while user_response.lower() not in ['y', 'n']:
+                user_response = input(f"{Fore.RED}Invalid input. Please enter 'y' to continue or 'n' to abort: ")
 
-        if user_response.lower() == 'y':
-            print(f"{Fore.BLUE}Continuing without a query parameter...")
-            return True
-        elif user_response.lower() == 'n':
-            print(f"{Fore.RED}Process aborted.")
-            exit(0)
-    else:
-        print(Fore.BLUE + "[*] Target URL contains a query string, testing with payloads...")
+            if user_response.lower() == 'y':
+                print(f"{Fore.BLUE}Continuing without a query parameter...")
+                return True
+            elif user_response.lower() == 'n':
+                print(f"{Fore.RED}Process aborted.")
+                sys.exit(0)
+        else:
+            print(Fore.BLUE + "[*] Target URL contains a query string, testing with payloads...")
 
-    return True
+        return True
+    except Exception as e:
+        print(f"{Fore.RED}Error in checking query string: {e}")
+        sys.exit(1)
 
 
 def check_url_alive(url):
@@ -97,22 +103,26 @@ def create_driver(custom_headers=None):
     Returns:
         webdriver: The configured Selenium WebDriver instance.
     """
-    options = Options()
-    options.add_argument("--headless")  # Headless mode
+    try:
+        options = Options()
+        options.add_argument("--headless")  # Headless mode
 
-    # Selenium-wire configurations to intercept requests
-    seleniumwire_options = {}
+        # Selenium-wire configurations to intercept requests
+        seleniumwire_options = {}
 
-    driver = webdriver.Firefox(options=options, seleniumwire_options=seleniumwire_options)
+        driver = webdriver.Firefox(options=options, seleniumwire_options=seleniumwire_options)
 
-    # If custom headers are provided, apply request interception
-    if custom_headers:
-        def interceptor(request):
-            request.headers = custom_headers.copy()
+        # If custom headers are provided, apply request interception
+        if custom_headers:
+            def interceptor(request):
+                request.headers = custom_headers.copy()
 
-        driver.request_interceptor = interceptor
+            driver.request_interceptor = interceptor
 
-    return driver
+        return driver
+    except Exception as e:
+        print(f"{Fore.RED}Error creating Selenium WebDriver: {e}")
+        sys.exit(1)
 
 
 def get_payloads_from_file(file_path):
@@ -148,8 +158,12 @@ def load_db_patterns(file_path="Patterns/db_patterns.json"):
     Returns:
         dict: The database patterns loaded from the file.
     """
-    with open(file_path, 'r') as file:
-        return json.load(file)
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except Exception as e:
+        print(f"{Fore.RED}Error loading database patterns: {e}")
+        sys.exit(1)
 
 
 def load_headers_from_file(file_path):
@@ -181,6 +195,9 @@ def load_headers_from_file(file_path):
     except IOError as e:
         print(f"{Fore.RED}Error reading header file '{file_path}': {e}")
         sys.exit(1)
+    except Exception as e:
+        print(f"{Fore.RED}Unexpected error loading headers: {e}")
+        sys.exit(1)
     return headers
 
 
@@ -207,5 +224,56 @@ def load_headers(headers):
         except ValueError:
             print(f"{Fore.RED}Error: '{header}'. Should be in the format 'Header-Name: value'.")
             sys.exit(1)
+        except Exception as e:
+            print(f"{Fore.RED}Unexpected error loading header '{header}': {e}")
+            sys.exit(1)
 
     return custom_headers
+
+
+def export_results(results, filename, format):
+    """
+    Exports the results to a specified file in the desired format (JSON, XML, or plain text).
+
+    Parameters:
+        results (list): A list of dictionaries containing the scan results.
+        filename (str): The name of the file to save the results in.
+        format (str): The format to export the results in. Can be "json", "xml", or "plain".
+
+    Raises:
+        SystemExit: If there is an error exporting the results, the program exits.
+    """
+    try:
+        match format:
+            case "json":
+                # Export results in JSON format
+                with open(filename, 'w', encoding='utf-8') as f:
+                    json.dump(results, f, indent=4)
+                print(Fore.GREEN + f"Results exported in JSON format as {filename}.")
+            case "xml":
+                # Export results in XML format
+                root = ET.Element("ScanResults")
+                for result in results:
+                    item = ET.SubElement(root, "Result")
+                    ET.SubElement(item, "Identifier").text = result["URL"]
+                    ET.SubElement(item, "Payload").text = result["Payload"]
+                    ET.SubElement(item, "AttackType").text = result["attack_type"]
+                    ET.SubElement(item, "Timestamp").text = result["timestamp"]
+                tree = ET.ElementTree(root)
+                tree.write(filename)
+                print(Fore.GREEN + f"Results exported in XML format as {filename}.")
+            case "plain":
+                # Export results in plain text format
+                with open(filename, "w") as file:
+                    for result in results:
+                        file.write(f"Identifier: {result['URL']}, Payload: {result['Payload']}, "
+                                   f"Attack Type: {result['attack_type']}, "
+                                   f"Timestamp: {result['timestamp']}\n")
+                print(Fore.GREEN + f"Results exported in plain text format as {filename}.")
+            case _:
+                print("Invalid Format")
+                sys.exit(1)
+    except Exception as e:
+        # Handle any exceptions that occur during the export process
+        print(f"{Fore.RED}Error exporting results: {e}")
+        sys.exit(1)
