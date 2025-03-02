@@ -18,6 +18,7 @@ from colorama import init, Fore
 from cli.cli_parser import CLIParser
 from scanner.sqli_scanner import SQLiScanner
 from scanner.xss_scanner import XSSScanner
+from utils.network import check_url_alive
 from utils.io_utils import export_results, load_headers, load_headers_from_file
 from utils.prompt import prompt_attack_type, prompt_url
 
@@ -77,7 +78,9 @@ def main():
         custom_headers = load_headers(args.header)
 
     # Instantiate the scanner with the target URL, payload list, and headers
-    scanner = scanner_class(target_url, payload_list, headers=custom_headers)
+
+    if check_url_alive(target_url):
+        scanner = scanner_class(target_url, payload_list, headers=custom_headers)
 
     # Start the scanning process and display progress
     print(Fore.CYAN + "[*] Starting scan...")
