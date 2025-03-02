@@ -13,8 +13,6 @@ By using this tool, you agree to use it responsibly and within the bounds of the
 
 from colorama import Fore
 
-from utils.network import check_url_alive
-
 
 def prompt_attack_type():
     # Display attack type options
@@ -37,10 +35,4 @@ def prompt_attack_type():
 def prompt_url():
     # Prompt user for a target URL
     url = input(Fore.CYAN + "[*] Enter target URL: ").strip()
-    # Add HTTPS prefix if protocol is missing
-    if not url.startswith(('http://', 'https://')):
-        url = 'https://' + url
-    # Check if URL is reachable; raise error if not
-    if not check_url_alive(url):
-        raise ValueError("URL not reachable")
     return url  # Return the validated URL

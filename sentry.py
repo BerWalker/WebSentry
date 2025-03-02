@@ -18,8 +18,8 @@ from colorama import init, Fore
 from cli.cli_parser import CLIParser
 from scanner.sqli_scanner import SQLiScanner
 from scanner.xss_scanner import XSSScanner
-from utils.network import check_url_alive
 from utils.io_utils import export_results, load_headers, load_headers_from_file
+from utils.network import check_url_alive
 from utils.prompt import prompt_attack_type, prompt_url
 
 # Initialize colorama for colored terminal output
@@ -61,12 +61,6 @@ def main():
     if not target_url.startswith(('http://', 'https://')):
         target_url = 'https://' + target_url
 
-    # Select the appropriate scanner class based on the attack type
-    scanner_class = scanner_map.get(attack_type.lower())
-
-    # Set the payload list file path, defaulting to a predefined file if not provided
-    payload_list = args.wordlist or f'PayloadLists/{attack_type.upper()}.txt'
-
     custom_headers = None
 
     # Load custom headers from a file if specified
@@ -77,8 +71,13 @@ def main():
     if args.header:
         custom_headers = load_headers(args.header)
 
-    # Instantiate the scanner with the target URL, payload list, and headers
+    # Select the appropriate scanner class based on the attack type
+    scanner_class = scanner_map.get(attack_type.lower())
 
+    # Set the payload list file path, defaulting to a predefined file if not provided
+    payload_list = args.wordlist or f'PayloadLists/{attack_type.upper()}.txt'
+
+    # Instantiate the scanner with the target URL, payload list, and headers
     if check_url_alive(target_url):
         scanner = scanner_class(target_url, payload_list, headers=custom_headers)
 
