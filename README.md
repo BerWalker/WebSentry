@@ -1,17 +1,25 @@
 # Sentry Web Vulnerability Scanner
 
-Sentry is a tool designed to audit and identify common vulnerabilities in web applications. It can be used to scan a target website by injecting various payloads into query strings and analyzing the responses.
+Sentry is a tool designed to audit and identify common vulnerabilities in web applications. It can be used to scan a
+target website by injecting various payloads into query strings and analyzing the responses.
 
-***Important**: Ensure that you have authorization to scan the target web application. Unauthorized usage is illegal and unethical.*
+***Important**: Ensure that you have authorization to scan the target web application. Unauthorized usage is illegal and
+unethical.*
 
 ## Features
 
-- **XSS (Cross-Site Scripting) Detection**: Scans for Cross-Site Scripting (XSS) vulnerabilities by injecting XSS payloads into the target URL's query string and detecting script execution on the page.
-- **SQL Injection (SQLi) Detection**: Identifies SQL Injection vulnerabilities by injecting SQL-specific payloads into the URL query string and checking for database error patterns or unexpected behavior.
-- **Wordlist-based Attacks**: Uses a list of payloads (either provided by the user or default) for testing vulnerabilities.
-- **Custom Headers**: Supports adding custom HTTP headers for each scan, either individually or through a file, allowing greater control over the request configurations.
-- **Selenium Integration**: Uses Selenium WebDriver to interact with dynamic content, making it possible to detect vulnerabilities like XSS that rely on JavaScript execution.
-- **Export Results**: Allows exporting scan results in plain text, JSON, and XML formats for easy analysis and reporting.
+- **XSS (Cross-Site Scripting) Detection**: Scans for Cross-Site Scripting (XSS) vulnerabilities by injecting XSS
+  payloads into the target URL's query string and detecting script execution on the page.
+- **SQL Injection (SQLi) Detection**: Identifies SQL Injection vulnerabilities by injecting SQL-specific payloads into
+  the URL query string and checking for database error patterns or unexpected behavior.
+- **Wordlist-based Attacks**: Uses a list of payloads (either provided by the user or default) for testing
+  vulnerabilities.
+- **Custom Headers**: Supports adding custom HTTP headers for each scan, either individually or through a file, allowing
+  greater control over the request configurations.
+- **Selenium Integration**: Uses Selenium WebDriver to interact with dynamic content, making it possible to detect
+  vulnerabilities like XSS that rely on JavaScript execution.
+- **Export Results**: Allows exporting scan results in plain text, JSON, and XML formats for easy analysis and
+  reporting.
 
 ## Requirements
 
@@ -45,8 +53,10 @@ python ./sentry.py [-h] [-a {xss,sqli}] [-u URL] [-w WORDLIST] [--header HEADER]
 
 - -a, --attack: Type of scan to perform.
 - -u, --url: Target URL to scan, e.g., https://example.com/query=.
-- -w, --wordlist: Path to a custom payload list file. If not specified, the default payload list for the selected attack type will be used.
-- --header: Custom headers in (Header-Name: value) format. This option can be specified multiple times to add multiple headers.
+- -w, --wordlist: Path to a custom payload list file. If not specified, the default payload list for the selected attack
+  type will be used.
+- --header: Custom headers in (Header-Name: value) format. This option can be specified multiple times to add multiple
+  headers.
 - --header-file: Path to a file with custom headers. Each line should follow the format (Header-Name: value).
 - -o, --output: Export results in plain text format (.txt).
 - -oJ, --output-json: Export results in JSON format (.json).
@@ -58,6 +68,7 @@ python ./sentry.py [-h] [-a {xss,sqli}] [-u URL] [-w WORDLIST] [--header HEADER]
 ```bash
 python ./sentry.py -a sqli -u https://example.com/page?query= --header "User-Agent: CustomAgent/1.0" --header "Authorization: token123" -o results.txt
 ```
+
 ```bash
 python ./sentry.py -a xss -u https://example.com/page?query= --header-file headers.txt -w /Path/to/Wordlist.txt -oJ /path/to/results.json
 ```

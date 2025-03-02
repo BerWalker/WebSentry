@@ -1,9 +1,25 @@
-from scanner.base_scanner import BaseScanner
-from datetime import datetime
-from utils.io_utils import load_db_patterns
+"""
+Copyright (c) 2024 Bernardo Walker Leichtweis
+
+Licensed under the MIT License. See the LICENSE file for details.
+
+WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
+vulnerabilities in web applications with explicit authorization from the application owner.
+
+Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
+responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
+By using this tool, you agree to use it responsibly and within the bounds of the law.
+"""
+
 import re
 import time
+from datetime import datetime
+
 from colorama import Fore
+
+from scanner.base_scanner import BaseScanner
+from utils.io_utils import load_db_patterns
+
 
 # Define a scanner class for SQL Injection vulnerabilities
 class SQLiScanner(BaseScanner):
@@ -22,7 +38,7 @@ class SQLiScanner(BaseScanner):
 
             # Check if any database error patterns match the page source
             db_found = next((db_type for db_type, pattern in self.db_patterns.items()
-                            if re.search(pattern, page_source, re.IGNORECASE)), None)
+                             if re.search(pattern, page_source, re.IGNORECASE)), None)
             if db_found:
                 # If a match is found, log the success and return a result dictionary
                 print(Fore.GREEN + f"[+] Possible SQLi found: {self.target_url} | Payload: {payload} | DB: {db_found}")

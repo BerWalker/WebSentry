@@ -1,8 +1,24 @@
+"""
+Copyright (c) 2024 Bernardo Walker Leichtweis
+
+Licensed under the MIT License. See the LICENSE file for details.
+
+WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
+vulnerabilities in web applications with explicit authorization from the application owner.
+
+Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
+responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
+By using this tool, you agree to use it responsibly and within the bounds of the law.
+"""
+
 from abc import ABC, abstractmethod
+
+from colorama import Fore
+
 from utils.driver import create_driver
 from utils.io_utils import get_payloads_from_file
 from utils.network import has_query
-from colorama import Fore
+
 
 # Define an abstract base class for all scanners
 class BaseScanner(ABC):

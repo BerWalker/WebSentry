@@ -1,7 +1,22 @@
-import sys
+"""
+Copyright (c) 2024 Bernardo Walker Leichtweis
+
+Licensed under the MIT License. See the LICENSE file for details.
+
+WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
+vulnerabilities in web applications with explicit authorization from the application owner.
+
+Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
+responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
+By using this tool, you agree to use it responsibly and within the bounds of the law.
+"""
+
 import json
+import sys
 import xml.etree.ElementTree as Et
+
 from colorama import Fore
+
 
 def get_payloads_from_file(file_path):
     try:
@@ -16,6 +31,7 @@ def get_payloads_from_file(file_path):
         print(Fore.RED + f"[!] Error reading payloads: {e}")
         raise  # Raise the exception
 
+
 def load_db_patterns(file_path="patterns/db_patterns.json"):
     try:
         # Load and return JSON data from the specified file
@@ -25,6 +41,7 @@ def load_db_patterns(file_path="patterns/db_patterns.json"):
         # Print error in red if JSON loading fails
         print(Fore.RED + f"[!] Error loading DB patterns: {e}")
         raise  # Raise the exception
+
 
 def load_headers_from_file(file_path):
     headers = {}
@@ -53,6 +70,7 @@ def load_headers_from_file(file_path):
         sys.exit(1)
     return headers  # Return the dictionary of headers
 
+
 def load_headers(headers):
     custom_headers = {}
     # Process a list of header strings in "Key: Value" format
@@ -70,6 +88,7 @@ def load_headers(headers):
             print(f"{Fore.RED}Unexpected error loading header '{header}': {e}")
             sys.exit(1)
     return custom_headers  # Return the dictionary of headers
+
 
 def export_results(results, filename, format_type):
     try:

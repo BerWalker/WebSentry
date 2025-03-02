@@ -1,13 +1,29 @@
+"""
+Copyright (c) 2024 Bernardo Walker Leichtweis
+
+Licensed under the MIT License. See the LICENSE file for details.
+
+WARNING: This tool is intended for ethical use only. It is designed for auditing and identifying security
+vulnerabilities in web applications with explicit authorization from the application owner.
+
+Unauthorized use or use for malicious purposes is strictly prohibited and may be illegal. The author(s) assume no
+responsibility or liability for any damage, legal consequences, or other issues arising from the misuse of this tool.
+By using this tool, you agree to use it responsibly and within the bounds of the law.
+"""
+
 import sys
+
+from colorama import init, Fore
+
 from cli.cli_parser import CLIParser
-from scanner.xss_scanner import XSSScanner
 from scanner.sqli_scanner import SQLiScanner
+from scanner.xss_scanner import XSSScanner
 from utils.io_utils import export_results, load_headers, load_headers_from_file
 from utils.prompt import prompt_attack_type, prompt_url
-from colorama import init, Fore
 
 # Initialize colorama for colored terminal output
 init(autoreset=True)
+
 
 def main():
     # Create an instance of CLIParser to handle command-line arguments
@@ -75,6 +91,7 @@ def main():
         export_results(results, args.output_json, "json")
     if args.output_xml:
         export_results(results, args.output_xml, "xml")
+
 
 if __name__ == "__main__":
     try:
