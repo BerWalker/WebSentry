@@ -32,7 +32,7 @@ def get_payloads_from_file(file_path):
         raise  # Raise the exception
 
 
-def load_db_patterns(file_path="patterns/db_patterns.json"):
+def load_db_patterns(file_path="Patterns/db_patterns.json"):
     try:
         # Load and return JSON data from the specified file
         with open(file_path, 'r') as f:

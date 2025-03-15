@@ -41,5 +41,5 @@ class XSSScanner(BaseScanner):
             }
         except Exception:
             # If no alert is triggered or an error occurs, log the failure and return None
-            print(Fore.RED + f"[-] No XSS found: {modified_url} | Payload: {payload}")
+            print(Fore.RED + f"[-] No XSS found: {self.target_url} | Payload: {payload}")
             return None

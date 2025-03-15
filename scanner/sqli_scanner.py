@@ -49,7 +49,7 @@ class SQLiScanner(BaseScanner):
                     "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
             # If no match, log the failure and return None
-            print(Fore.RED + f"[-] No SQLi found: {modified_url} | Payload: {payload}")
+            print(Fore.RED + f"[-] No SQLi found: {self.target_url} | Payload: {payload}")
             return None
         except Exception as e:
             # Handle any errors during the test (e.g., network issues) and log them
