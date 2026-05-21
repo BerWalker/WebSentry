@@ -1,0 +1,7 @@
+rules:
+  - id: no-print-statements
+    patterns:
+      - pattern: print(...)
+    message: "Voce esta usando print ao inves de logger!!!"
+    languages: [python]
+    severity: WARNING

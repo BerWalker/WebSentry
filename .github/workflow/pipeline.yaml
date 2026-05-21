@@ -1,0 +1,30 @@
+name: CICD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  semgrep:
+    name: semgrep
+    runs-on: self-hosted
+
+    container:
+      image: semgrep/semgrep
+
+    steps: 
+      - uses: actions/checkout@v6
+
+      - run: semgrep ci --config rules.yaml
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+  fossa:
+    name: fossa
+    runs-on: self-hosted
+    needs: semgrep
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fossas/fossa-action@main
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
